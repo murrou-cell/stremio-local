@@ -4,8 +4,8 @@ FROM golang:1.21-alpine AS build
 # Set working directory
 WORKDIR /app
 
-# Copy go.mod and go.sum first for caching
-COPY go.mod go.sum ./
+# Copy go.mod first for caching
+COPY go.mod ./
 RUN go mod download
 
 # Copy the rest of the source
