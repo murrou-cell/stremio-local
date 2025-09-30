@@ -1,0 +1,22 @@
+replicaCount: 1
+
+image:
+  repository: your-dockerhub-username/stremio-addon
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8081
+
+persistence:
+  # Set hostPath to mount your server folder, leave empty to disable
+  hostPath: /home/murrou/media
+  mountPath: /media
+
+tailscaleIngress:
+  enabled: true
+  host: stremio-local
+  serviceName: stremio-local
+  servicePort: 8081
+  funnel: true
