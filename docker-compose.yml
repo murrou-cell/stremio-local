@@ -1,13 +1,10 @@
 services:
   stremio-local:
     image: ghcr.io/murrou-cell/stremio-local:main
+    pull_policy: always
     container_name: stremio-local
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile
     ports:
-      - "8081:8081"   # Expose the addon port
+      - "8081:8081"
     volumes:
-      - ./media:/usr/local/bin/media
       - ./media:/media
     restart: unless-stopped
