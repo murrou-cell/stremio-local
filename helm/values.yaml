@@ -10,7 +10,6 @@ service:
   port: 8081
 
 persistence:
-  # Set hostPath to mount your server folder, leave empty to disable
   hostPath: /home/murrou/media
   mountPath: /media
 
