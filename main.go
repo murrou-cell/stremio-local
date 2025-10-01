@@ -20,7 +20,8 @@ type MediaItem struct {
 	Subtitles []string
 }
 
-var mediaDir = "./media" // root folder with subfolders
+var mediaDir = "/media" // root folder with subfolders
+
 var catalogMap = map[string][]MediaItem{}
 var mediaMap = map[string]MediaItem{} // map fake ttID -> item
 
@@ -38,6 +39,9 @@ func withCORS(handler http.HandlerFunc) http.HandlerFunc {
 }
 
 func main() {
+	if len(os.Args) > 1 {
+		mediaDir = os.Args[1]
+	}
 	scanMediaDir(mediaDir)
 
 	http.HandleFunc("/manifest.json", withCORS(manifestHandler))

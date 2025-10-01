@@ -1,12 +1,13 @@
 services:
   stremio-local:
-    image: your-dockerhub-username/stremio-addon:latest
+    image: ghcr.io/murrou-cell/stremio-local:main
     container_name: stremio-local
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     ports:
       - "8081:8081"   # Expose the addon port
     volumes:
-      - media:/media   # Mount your local media folder
+      - ./media:/usr/local/bin/media
+      - ./media:/media
     restart: unless-stopped
