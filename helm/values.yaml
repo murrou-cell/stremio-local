@@ -10,7 +10,7 @@ service:
   port: 8081
 
 persistence:
-  hostPath: /home/murrou/media
+  hostPath: /home/USER/media
   mountPath: /media
 
 tailscaleIngress:
