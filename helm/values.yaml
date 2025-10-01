@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: your-dockerhub-username/stremio-addon
+  repository: ghcr.io/murrou-cell/stremio-local:main
   tag: latest
   pullPolicy: IfNotPresent
 
