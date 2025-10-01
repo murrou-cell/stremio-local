@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/murrou-cell/stremio-local:main
-  tag: latest
+  repository: ghcr.io/murrou-cell/stremio-local
+  tag: main
   pullPolicy: IfNotPresent
 
 service:
