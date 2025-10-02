@@ -232,10 +232,10 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 
 // -------------------- Stream --------------------
 func absURL(r *http.Request, path string) string {
-	scheme := "http"
-	if r.TLS != nil {
-		scheme = "https"
-	}
+	scheme := "https"
+	// if r.TLS != nil {
+	// 	scheme = "https"
+	// }
 	host := r.Host // automatically includes port if needed
 	return fmt.Sprintf("%s://%s/%s", scheme, host, path)
 }
