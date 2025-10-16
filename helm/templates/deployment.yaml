@@ -25,6 +25,9 @@ spec:
             - name: media
               mountPath: {{ .Values.persistence.mountPath }}
           {{- end }}
+          env:
+            - name: TMDB_API_KEY
+              value: "{{ .Values.env.TMDB_API_KEY }}"
       {{- if .Values.persistence.hostPath }}
       volumes:
         - name: media

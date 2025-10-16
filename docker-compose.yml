@@ -7,4 +7,6 @@ services:
       - "8081:8081"
     volumes:
       - ./media:/media
+    env: 
+      - TMDB_API_KEY=your_tmdb_api_key_here
     restart: unless-stopped

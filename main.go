@@ -7,10 +7,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"main.go/pkg/bggenerator"
 )
 
 type MediaItem struct {
@@ -55,23 +56,28 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
 
-func generatePoster(title string) string {
-	text := url.QueryEscape(title)
-	width, height := 200, 300
-	bgColor := "444444"   // dark gray background
-	textColor := "ffffff" // white text
+// func generatePoster(title string) string {
+// 	text := url.QueryEscape(title)
+// 	width, height := 200, 300
+// 	bgColor := "444444"   // dark gray background
+// 	textColor := "ffffff" // white text
 
-	// Example: https://dummyimage.com/200x300/444444/ffffff&text=The+Traitors
-	return fmt.Sprintf("https://dummyimage.com/%dx%d/%s/%s&text=%s", width, height, bgColor, textColor, text)
-}
+// 	// Example: https://dummyimage.com/200x300/444444/ffffff&text=The+Traitors
+// 	return fmt.Sprintf("https://dummyimage.com/%dx%d/%s/%s&text=%s", width, height, bgColor, textColor, text)
+// }
 
-func generateBackground(title string) string {
-	text := url.QueryEscape(title)
-	width, height := 1280, 720
-	bgColor := "222222"
-	textColor := "ffffff"
+// func generateBackground(title string) string {
+// 	text := url.QueryEscape(title)
+// 	width, height := 1280, 720
+// 	bgColor := "222222"
+// 	textColor := "ffffff"
 
-	return fmt.Sprintf("https://dummyimage.com/%dx%d/%s/%s&text=%s", width, height, bgColor, textColor, text)
+// 	return fmt.Sprintf("https://dummyimage.com/%dx%d/%s/%s&text=%s", width, height, bgColor, textColor, text)
+// }
+
+func generateBG(title string) string {
+	result := bggenerator.GenerateBackground(title)
+	return result
 }
 
 func metaHandler(w http.ResponseWriter, r *http.Request) {
@@ -91,8 +97,8 @@ func metaHandler(w http.ResponseWriter, r *http.Request) {
 		"id":         item.ID,
 		"type":       "movie",
 		"name":       item.Title,
-		"poster":     generatePoster(item.Title),
-		"background": generateBackground(item.Title),
+		"poster":     generateBG(item.Title),
+		"background": generateBG(item.Title),
 		"year":       2025, // optional: extract from filename if needed
 		"plot":       "Local movie served via Stremio addon",
 		"genres":     []string{"Local"},
@@ -189,12 +195,14 @@ func manifestHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	manifest := map[string]interface{}{
-		"id":        "stremio-local",
-		"version":   "1.0.0",
-		"name":      "Local Media",
-		"resources": []string{"catalog", "meta", "stream", "subtitles"},
-		"types":     []string{"movie"},
-		"catalogs":  catalogs,
+		"id":          "stremio-local",
+		"version":     "2.0.0",
+		"name":        "Local Media",
+		"resources":   []string{"catalog", "meta", "stream", "subtitles"},
+		"types":       []string{"movie"},
+		"catalogs":    catalogs,
+		"description": "Serve your local media files via Stremio addon.",
+		"logo":        "https://t4.ftcdn.net/jpg/07/40/64/77/360_F_740647793_KaqS2JirW6vMEurzE1kE59LvIvMHsUSn.jpg",
 	}
 
 	json.NewEncoder(w).Encode(manifest)
@@ -221,7 +229,7 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 			"id":     item.ID,
 			"type":   "movie",
 			"name":   item.Title,
-			"poster": generatePoster(item.Title),
+			"poster": generateBG(item.Title),
 		})
 	}
 	log.Println("Returning", metas)
@@ -321,3 +329,19 @@ func filesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	http.StripPrefix("/files/", http.FileServer(http.Dir(mediaDir))).ServeHTTP(w, r)
 }
+
+// Requests that can be made
+// localhost:8081/manifest.json
+// localhost:8081/catalog/movie/<catalogID>.json
+// localhost:8081/meta/movie/<ttID>.json
+// localhost:8081/stream/movie/<ttID>.json
+// localhost:8081/subtitles/movie/<ttID>.json
+// localhost:8081/files/<relative path to media or subtitle>
+
+// example with movie in media/india-1/The.Traitors.India.S01E01.HINDI.1080p.H264-TheArmory.mp4
+// http://localhost:8081/catalog/movie/india-1.json
+// http://localhost:8081/meta/movie/1736337.json
+// http://localhost:8081/stream/movie/1736337.json
+// http://localhost:8081/subtitles/movie/1736337.json
+// http://localhost:8081/files/india-1/The.Traitors.India.S01E01.HINDI.1080p.H264-TheArmory.mp4
+// http://localhost:8081/files/india-1/The.Traitors.India.S01E01.HINDI.1080p.H264-TheArmory.en.srt

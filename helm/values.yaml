@@ -19,3 +19,5 @@ tailscaleIngress:
   serviceName: stremio-local
   servicePort: 8081
   funnel: true
+env:
+  TMDB_API_KEY: your_tmdb_api_key_here
