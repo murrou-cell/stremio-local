@@ -3,6 +3,7 @@ package bggenerator
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -143,14 +144,15 @@ func detectCountry(title string) string {
 
 func getBackgroundFromCache(title string) (string, bool) {
 	result, found := cache[title]
+	if found {
+		log.Printf("Returning logo from cache for %s", title)
+	}
 	return result, found
 }
 
 func GenerateBackground(rawTitle string) string {
 	cleaned := cleanTitle(rawTitle)
-	if result, found := getBackgroundFromCache(cleaned); found {
-		return result
-	}
+
 	searchTerm := cleaned
 
 	mediaType := detectType(rawTitle)
@@ -159,23 +161,25 @@ func GenerateBackground(rawTitle string) string {
 	if region != "" {
 		searchTerm = fmt.Sprintf("%s (%s)", cleaned, region)
 	}
-
+	if result, found := getBackgroundFromCache(searchTerm); found {
+		return result
+	}
 	// Try type-specific search first
 	img, err := searchTMDB(searchTerm, mediaType)
 	if err == nil {
-		cache[cleaned] = img
+		cache[searchTerm] = img
 		return img
 	}
 
 	// Fallback: try /multi (handles cross-type confusion)
 	img, err = searchTMDB(cleaned, "multi")
 	if err == nil {
-		cache[cleaned] = img
+		cache[searchTerm] = img
 		return img
 	}
 
 	// Final fallback: dummy image
 	text := url.QueryEscape(cleaned)
-	cache[cleaned] = fmt.Sprintf("https://dummyimage.com/1280x720/222222/ffffff&text=%s", text)
-	return cache[cleaned]
+	cache[searchTerm] = fmt.Sprintf("https://dummyimage.com/1280x720/222222/ffffff&text=%s", text)
+	return cache[searchTerm]
 }
